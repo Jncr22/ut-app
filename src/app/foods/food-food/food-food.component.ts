@@ -1,30 +1,78 @@
 import { Component } from '@angular/core';
-import {FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormBuilder,ReactiveFormsModule,Validators,} from '@angular/forms';
+import {FormsModule} from '@angular/forms';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButton} from "@angular/material/button";
+import {MatSelectModule} from '@angular/material/select';
+import { Food, FoodService } from '../../shared';
 @Component({
   selector: 'app-food-food',
   standalone: true,
-  imports: [ReactiveFormsModule, MatIconModule, MatInputModule, MatFormFieldModule, MatButton],
+  imports: [ReactiveFormsModule,
+            MatIconModule,
+            MatInputModule,
+            MatFormFieldModule,
+            MatButton,
+            FormsModule,
+            MatSelectModule,],
   templateUrl: './food-food.component.html',
   styleUrl: './food-food.component.scss'
 })
 export class FoodFoodComponent {
-  name = new FormControl([Validators.maxLength(20), Validators.required]);
+  form = this.formBuilder.group({
+    name: ['', [Validators.required]],
+    description: ['', [Validators.required, Validators.minLength(20)]],
+    category: ['', [Validators.required]],
+    image: ['', [Validators.required]],
+    price: ['', [Validators.required, Validators.min(2)]],
+  });
 
-  public showValue() {
-    if (this.name.hasError('required')) {
-      return 'You must enter a value';
-    } else if (this.name.hasError('maxLength')) {
-      return 'Minimo 20 caracteres'
+  constructor(
+    private formBuilder: FormBuilder,
+    public serviceFood: FoodService,
+  ) {}
+
+  public sentData() {
+    if (this.form.status === 'VALID') {
+      if (
+        this.getName?.value &&
+        this.getDescription?.value &&
+        this.getCategory?.value &&
+        this.getImage?.value &&
+        this.getPrice?.value
+      ) {
+        let priceNumber = Number(this.getPrice?.value);
+        let comida: Food = {
+          name: this.getName?.value,
+          description: this.getDescription?.value,
+          category: this.getCategory?.value,
+          image: this.getImage?.value,
+          price: priceNumber
+        }
+        this.serviceFood.addFood(comida);
+      }
     }
-    return 'Error';
   }
 
-  public changeValue(): void {
-    // this.name.setValue('Pizza de queso')
+  get getName() {
+    return this.form.get('name');
   }
 
+  get getDescription() {
+    return this.form.get('description');
+  }
+
+  get getCategory() {
+    return this.form.get('category');
+  }
+
+  get getImage() {
+    return this.form.get('image');
+  }
+
+  get getPrice() {
+    return this.form.get('price');
+  }
 }
