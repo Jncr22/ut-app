@@ -17,6 +17,10 @@ export class FoodListComponent {
   }
 
   ngOnInit(): void {
-    this.data = this.foodService.getAllFood();
+    this.foodService.getAll().subscribe({
+      next:(value) => (this.data = value),
+      error:(e) => console.error(e),
+      complete:() => console.info('complete')
+    })
   }
 }
